@@ -64,6 +64,7 @@
         <module>mongodbreader</module>
         <module>rdbmsreader</module>
         <module>hbase11xreader</module>
+        <module>elasticsearchreader</module>
         <module>hbase094xreader</module>
         <module>tsdbreader</module>
         <module>opentsdbreader</module>
@@ -107,7 +108,6 @@
         <module>hbase20xsqlreader</module>
         <module>hbase20xsqlwriter</module>
         <module>kuduwriter</module>
-        <module>elasticsearchreader</module>
     </modules>
 
     <dependencyManagement>
