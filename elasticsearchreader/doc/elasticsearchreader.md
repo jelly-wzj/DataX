@@ -36,7 +36,7 @@
   "job": {
     "setting": {
       "speed": {
-        "byte": 10485760
+        "channel": 5
       },
       "errorLimit": {
         "record": 0,
@@ -55,61 +55,56 @@
             "type": "default",
             "searchType": "dfs_query_then_fetch",
             "headers": {
+              
             },
             "scroll": "3m",
             "search": [
               {
-                "size": 5,
-                "query": {
-                  "bool": {
-                    "must": [
-                      {
-                        "match": {
-                          "_id": "590000001878"
-                        }
-                      }
-                    ]
-                  }
+                "size": 1000,
+                "match_all": {
+                  
                 }
               }
-            ],
-            "table":{
-              "name": "TACHE",
-              "filter": "pk != null",
-              "nameCase": "UPPERCASE",
-              "column": [
-                {
-                  "name": "flow_id",
-                  "alias": "pk", 
-                },
-                {
-                  "name": "taches",
-                  "child": [
-                    {
-                      "name": "tch_id"
-                    },
-                    {
-                      "name": "tch_mod"
-                    },
-                    {
-                      "name": "flow_id"
-                    }
-                  ]
-                }
-              ]
             }
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true,
-            "encoding": "UTF-8"
+          ],
+          "table": {
+            "name": "TACHE",
+            "filter": "pk != null",
+            "nameCase": "UPPERCASE",
+            "column": [
+              {
+                "name": "flow_id",
+                "alias": "pk",
+                
+              },
+              {
+                "name": "taches",
+                "child": [
+                  {
+                    "name": "tch_id"
+                  },
+                  {
+                    "name": "tch_mod"
+                  },
+                  {
+                    "name": "flow_id"
+                  }
+                ]
+              }
+            ]
           }
         }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true,
+          "encoding": "UTF-8"
+        }
       }
-    ]
-  }
+    }
+  ]
+}
 }
 ```
 
