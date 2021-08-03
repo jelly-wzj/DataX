@@ -94,7 +94,13 @@
             <artifactId>plugin-unstructured-storage-util</artifactId>
             <version>${datax-project-version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.pentaho</groupId>
+            <artifactId>pentaho-aggdesigner-algorithm</artifactId>
+            <version>5.1.5-jhyde</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/lib/pentaho-aggdesigner-algorithm-5.1.5-jhyde.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
