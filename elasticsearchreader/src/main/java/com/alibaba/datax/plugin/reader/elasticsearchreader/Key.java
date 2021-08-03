@@ -124,7 +124,6 @@ public final class Key {
         return false;
     }
 
-
     public static Map<String, Object> getSettings(Configuration conf) {
         return conf.getMap("settings", new HashMap<String, Object>());
     }
