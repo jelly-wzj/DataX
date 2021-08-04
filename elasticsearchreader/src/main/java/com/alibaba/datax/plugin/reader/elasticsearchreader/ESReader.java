@@ -101,7 +101,7 @@ public class ESReader extends Reader {
 
     public static class Task extends Reader.Task {
         private static final Logger log = LoggerFactory.getLogger(Job.class);
-        private final static Map<String, String> FIELD_TYPE_CACHE = new ConcurrentHashMap<>();
+        private static final Map<String, String> FIELD_TYPE_CACHE = new ConcurrentHashMap<>();
 
         private Configuration conf;
         ESClient esClient = null;
@@ -329,7 +329,7 @@ public class ESReader extends Reader {
 
         private String getTypeFromConfig(String fieldName, List<ESField> column) {
             String type = FIELD_TYPE_CACHE.get(fieldName);
-            if (StringUtils.isNotBlank(type)) {
+            if (FIELD_TYPE_CACHE.containsKey(fieldName)) {
                 return type;
             }
 
