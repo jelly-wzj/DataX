@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TODO
@@ -100,6 +101,7 @@ public class ESReader extends Reader {
 
     public static class Task extends Reader.Task {
         private static final Logger log = LoggerFactory.getLogger(Job.class);
+        private final static Map<String, String> FIELD_TYPE_CACHE = new ConcurrentHashMap<>();
 
         private Configuration conf;
         ESClient esClient = null;
@@ -326,12 +328,18 @@ public class ESReader extends Reader {
         }
 
         private String getTypeFromConfig(String fieldName, List<ESField> column) {
-            Optional<ESField> esField = column.stream().filter(ef -> ef.getName().equalsIgnoreCase(fieldName)).findFirst();
-            if (esField.equals(Optional.empty())) {
-                return null;
-            } else {
-                return esField.get().getType();
+            String type = FIELD_TYPE_CACHE.get(fieldName);
+            if (StringUtils.isNotBlank(type)) {
+                return type;
             }
+
+            Optional<ESField> esField = column.stream().filter(ef -> ef.getName().equalsIgnoreCase(fieldName)).findFirst();
+            if (!esField.equals(Optional.empty())) {
+                type = esField.get().getType();
+            }
+
+            FIELD_TYPE_CACHE.put(fieldName, type);
+            return type;
         }
 
         private Column getColumnWithType(Object value, String type) {
