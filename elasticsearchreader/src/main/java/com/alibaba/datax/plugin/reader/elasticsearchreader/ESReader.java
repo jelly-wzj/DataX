@@ -101,6 +101,7 @@ public class ESReader extends Reader {
 
     public static class Task extends Reader.Task {
         private static final Logger log = LoggerFactory.getLogger(Job.class);
+        // 不考虑并发
         private static final Map<String, String> FIELD_TYPE_CACHE = new HashMap<>();
 
         private Configuration conf;
