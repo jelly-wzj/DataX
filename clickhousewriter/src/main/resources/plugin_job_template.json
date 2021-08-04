@@ -1,8 +1,8 @@
 {
     "name": "clickhousewriter",
     "parameter": {
-        "username": "username",
-        "password": "password",
+        "username": "default",
+        "password": "",
         "column": ["col1", "col2", "col3"],
         "connection": [
             {

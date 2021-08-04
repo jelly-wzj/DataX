@@ -294,20 +294,26 @@ public class ESReader extends Reader {
             for (Map<String, Object> o : recordMaps) {
                 boolean allow = filter(table.getFilter(), table.getDeleteFilterKey(), o);
                 if (allow && o.entrySet().stream().anyMatch(x -> x.getValue() != null)) {
-                    Record record = buildRecord(recordSender, o);
+                    Record record = buildRecord(recordSender, o, table.getColumn());
                     recordSender.sendToWriter(record);
                 }
             }
         }
 
-        private Record buildRecord(RecordSender recordSender, Map<String, Object> source) {
+        private Record buildRecord(RecordSender recordSender, Map<String, Object> source, List<ESField> column) {
             Record record = recordSender.createRecord();
             boolean hasDirty = false;
             StringBuilder sb = new StringBuilder();
             for (Map.Entry<String, Object> entry : source.entrySet()) {
                 try {
-                    Object o = source.get(entry.getKey());
-                    record.addColumn(getColumn(entry.getKey(), o));
+                    String fieldName = entry.getKey();
+                    Object o = source.get(fieldName);
+                    String type = getTypeFromConfig(fieldName, column);
+                    if (null != type) {
+                        record.addColumn(getColumnWithType(o, type));
+                    } else {
+                        record.addColumn(getColumnWithValue(fieldName, o));
+                    }
                 } catch (Exception e) {
                     hasDirty = true;
                     sb.append(ExceptionTracker.trace(e));
@@ -319,7 +325,76 @@ public class ESReader extends Reader {
             return record;
         }
 
-        private Column getColumn(String name, Object value) {
+        private String getTypeFromConfig(String fieldName, List<ESField> column) {
+            Optional<ESField> esField = column.stream().filter(ef -> ef.getName().equalsIgnoreCase(fieldName)).findFirst();
+            if (esField.equals(Optional.empty())) {
+                return null;
+            } else {
+                return esField.get().getType();
+            }
+        }
+
+        private Column getColumnWithType(Object value, String type) {
+            if (value == null) {
+                return new StringColumn();
+            }
+
+            if (type == null) {
+                return new StringColumn((String) value);
+            }
+
+            Column col;
+            switch (type.toLowerCase()) {
+                case "string":
+                    col = new StringColumn((String) value);
+                    break;
+                case "integer":
+                    col = new LongColumn(((Integer) value).longValue());
+                    break;
+                case "byte":
+                    col = new LongColumn(((Byte) value).longValue());
+                    break;
+                case "long":
+                    col = new LongColumn((Long) value);
+                    break;
+                case "short":
+                    col = new LongColumn(((Short) value).longValue());
+                    break;
+                case "double":
+                    col = new DoubleColumn((Double) value);
+                    break;
+                case "float":
+                    col = new DoubleColumn(((Float) value).doubleValue());
+                    break;
+                case "date":
+                    col = new DateColumn((Date) value);
+                    break;
+                case "timestamp":
+                    if (value instanceof Double) {
+                        col = new DateColumn(((Double) value).longValue());
+                    } else {
+                        col = new DateColumn((Long) value);
+                    }
+                    break;
+                case "boolean":
+                    col = new BoolColumn((Boolean) value);
+                    break;
+                case "byte[]":
+                    col = new BytesColumn((byte[]) value);
+                    break;
+                case "list":
+                case "map":
+                case "array":
+                    col = new StringColumn(JSON.toJSONString(value));
+                    break;
+                default:
+                    throw DataXException.asDataXException(ESReaderErrorCode.UNKNOWN_DATA_TYPE, "type:" + type);
+            }
+
+            return col;
+        }
+
+        private Column getColumnWithValue(String name, Object value) {
             Column col;
             if (value == null) {
                 col = new StringColumn();

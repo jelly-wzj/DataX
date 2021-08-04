@@ -5,10 +5,21 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public class ESField {
+    private String type;
     private String name;
     private String alias;
     private Object value;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     private List<ESField> child;
+
 
     public String getName() {
         return name;
